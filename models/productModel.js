@@ -1,13 +1,4 @@
 const mongoose = require("mongoose");
-// const ObjectId = mongoose.Types.ObjectId;
-
-// function isValidObjectId(id) {
-//   if (ObjectId.isValid(id)) {
-//     if (String(new ObjectId(id)) === id) return true;
-//     return false;
-//   }
-//   return false;
-// }
 
 const productSchema = new mongoose.Schema(
   {
@@ -46,10 +37,6 @@ const productSchema = new mongoose.Schema(
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",
-      // validate: {
-      //   validator: isValidObjectId,
-      //   message: "Category must be an valid objectId",
-      // },
       required: true,
     },
     rating: {

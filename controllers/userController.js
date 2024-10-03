@@ -2,16 +2,14 @@ const asyncWrapper = require("../middlewares/asyncWrapper");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const generateJWT = require("../utilities/generateJWT");
-const fs = require("fs");
 const {
   sendErrorResponse,
   sendSuccessResponse,
 } = require("../utilities/sendResponse");
-const path = require("path");
 const {
-  cloudinaryUploadFile,
-  cloudinaryRemoveFile,
-} = require("../utilities/cloudinary");
+  removeFromCloudinary,
+  uploadToCloudinary,
+} = require("../utilities/cloudinaryCloud");
 
 const register = asyncWrapper(async (req, res) => {
   const { firstName, lastName, email, phone, password } = req.body;
@@ -45,27 +43,20 @@ const update = asyncWrapper(async (req, res) => {
 
 const userPhotoUpload = async (req, res, next) => {
   try {
-    // 1. Validation
     if (!req.file) {
       return sendErrorResponse(res, "No file uploaded", 400, {
         message: "No file uploaded",
       });
     }
-    // 2. Get th path to the photo
-    const photoPath = path.join(__dirname, `../uploads/${req.file.filename}`);
 
-    // 3. Upload to cloudinary
-    const result = await cloudinaryUploadFile(photoPath);
+    const result = await uploadToCloudinary(req.file.buffer);
 
-    // 4. Get the user from DB
     const user = await User.findById(req.currentUser.id);
 
-    // 5. Delete the old photo if it exists
     if (user.avatar.public_id !== null) {
-      await cloudinaryRemoveFile(user.avatar.public_id);
+      await removeFromCloudinary(user.avatar.public_id);
     }
 
-    // 6. Change the avatar field in the DB
     const updatedUser = await User.findByIdAndUpdate(
       req.currentUser.id,
       {
@@ -76,17 +67,13 @@ const userPhotoUpload = async (req, res, next) => {
           },
         },
       },
-      { new: true } // Returns the updated document
+      { new: true }
     );
 
-    // 7. Respond with success message
     sendSuccessResponse(res, "User photo uploaded successfully", 200, {
       url: result.secure_url,
       public_id: result.public_id,
     });
-
-    // 8. Remove the photo from server
-    fs.unlinkSync(photoPath);
   } catch (error) {
     next(error);
   }

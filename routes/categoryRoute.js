@@ -13,8 +13,8 @@ const validateCategory = require("../middlewares/validateCategory");
 const verifyToken = require("../middlewares/verifyToken");
 const allowedTo = require("../middlewares/allowedTo");
 const userRole = require("../utilities/userRoles");
-const { photoUpload } = require("../middlewares/photoUpload");
 const multerErrorHandler = require("../utilities/multerErrorHandler");
+const { imageUpload } = require("../middlewares/imageUpload");
 
 const router = express.Router();
 
@@ -49,7 +49,7 @@ router.patch(
   "/category-photo-upload/:id",
   verifyToken,
   allowedTo(userRole.ADMIN),
-  photoUpload.single("image"),
+  imageUpload.single("image"),
   categoryPhotoUpload
 );
 

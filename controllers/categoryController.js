@@ -1,16 +1,15 @@
 const asyncWrapper = require("../middlewares/asyncWrapper");
 const Category = require("../models/categoryModel");
-const path = require("path");
-const fs = require("fs");
 const {
   sendErrorResponse,
   sendSuccessResponse,
 } = require("../utilities/sendResponse");
-const {
-  cloudinaryUploadFile,
-  cloudinaryRemoveFile,
-} = require("../utilities/cloudinary");
+
 const checkIfIdIsValid = require("../middlewares/checkIfIdIsValid");
+const {
+  uploadToCloudinary,
+  removeFromCloudinary,
+} = require("../utilities/cloudinaryCloud");
 
 const addCategory = asyncWrapper(async (req, res) => {
   const newCategory = new Category({
@@ -103,27 +102,18 @@ const categoryPhotoUpload = async (req, res, next) => {
   }
 
   try {
-    // 1. Validation
     if (!req.file) {
       return sendErrorResponse(res, "No file uploaded", 400, {
         message: "No file uploaded",
       });
     }
-    // 2. Get th path to the photo
-    const photoPath = path.join(__dirname, `../uploads/${req.file.filename}`);
 
-    // 3. Upload to cloudinary
-    const result = await cloudinaryUploadFile(photoPath);
+    const result = await uploadToCloudinary(req.file.buffer);
 
-    // 4. Get the user from DB
-    // Above
-
-    // 5. Delete the old photo if it exists
     if (category.image.public_id !== null) {
-      await cloudinaryRemoveFile(category.image.public_id);
+      await removeFromCloudinary(category.image.public_id);
     }
 
-    // 6. Change the avatar field in the DB
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
       {
@@ -134,17 +124,13 @@ const categoryPhotoUpload = async (req, res, next) => {
           },
         },
       },
-      { new: true } // Returns the updated document
+      { new: true }
     );
 
-    // 7. Respond with success message
     sendSuccessResponse(res, "Category photo uploaded successfully", 200, {
       url: result.secure_url,
       public_id: result.public_id,
     });
-
-    // 8. Remove the photo from server
-    fs.unlinkSync(photoPath);
   } catch (error) {
     next(error);
   }
@@ -159,20 +145,21 @@ const deleteCategory = asyncWrapper(async (req, res) => {
 
   const category = await Category.findById(req.params.id);
 
+  if (!category) {
+    return sendErrorResponse(res, "Category not found", 404, {
+      message: "Category not found",
+    });
+  }
+
   try {
     if (category.image.public_id !== null) {
-      await cloudinaryRemoveFile(category.image.public_id);
+      await removeFromCloudinary(category.image.public_id);
     }
   } catch (error) {
     next(error);
   }
 
   const deletedCategory = await Category.findByIdAndDelete(req.params.id);
-  if (!deletedCategory) {
-    return sendErrorResponse(res, "Category not found", 404, {
-      message: "Category not found",
-    });
-  }
   sendSuccessResponse(
     res,
     "Category deleted successfully",

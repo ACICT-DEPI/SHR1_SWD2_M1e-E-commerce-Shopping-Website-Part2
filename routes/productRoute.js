@@ -17,7 +17,7 @@ const verifyToken = require("../middlewares/verifyToken");
 const allowedTo = require("../middlewares/allowedTo");
 const userRole = require("../utilities/userRoles");
 const multerErrorHandler = require("../utilities/multerErrorHandler");
-const { photoUpload } = require("../middlewares/photoUpload");
+const { imageUpload } = require("../middlewares/imageUpload");
 
 const router = express.Router();
 
@@ -59,7 +59,7 @@ router.patch(
   "/product-photos-upload/:id",
   verifyToken,
   allowedTo(userRole.ADMIN),
-  photoUpload.array("gallery", 5),
+  imageUpload.array("gallery", 5),
   productPhotosUpload
 );
 

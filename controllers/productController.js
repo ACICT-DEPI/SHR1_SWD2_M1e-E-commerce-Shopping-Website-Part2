@@ -7,12 +7,12 @@ const {
   sendErrorResponse,
   sendSuccessResponse,
 } = require("../utilities/sendResponse");
-const {
-  cloudinaryUploadFile,
-  cloudinaryRemoveFile,
-} = require("../utilities/cloudinary");
 const checkIfIdIsValid = require("../middlewares/checkIfIdIsValid");
 const checkIfCategoryExists = require("../middlewares/checkIfCategoryExists");
+const {
+  uploadToCloudinary,
+  removeFromCloudinary,
+} = require("../utilities/cloudinaryCloud");
 
 const addProduct = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.body.category)) {
@@ -191,32 +191,18 @@ const productPhotosUpload = async (req, res, next) => {
       });
     }
 
-    // 2. Get th path to the photos
-    const photosPath = [];
-    req.files.map((file) => {
-      const photoPath = path.join(__dirname, `../uploads/${file.filename}`);
-      photosPath.push(photoPath);
-    });
-
-    // 3. Upload to cloudinary
     const results = await Promise.all(
-      photosPath.map(async (photoPath) => {
-        const result = await cloudinaryUploadFile(photoPath);
-        return result; // Return the result from cloudinaryUploadFile
+      req.files.map(async (file) => {
+        const result = await uploadToCloudinary(file.buffer);
+        return result;
       })
     );
-
-    // 4. Get the product from DB
-    // Above
-
-    // 5. Delete the old photo if it exists
     product.gallery.map(async (photo) => {
       if (photo.public_id !== null) {
-        await cloudinaryRemoveFile(photo.public_id);
+        await removeFromCloudinary(photo.public_id);
       }
     });
 
-    // 6. Change the gallery field in the DB
     const newGallery = [];
     results.map((result) => {
       newGallery.push({
@@ -232,21 +218,15 @@ const productPhotosUpload = async (req, res, next) => {
           gallery: newGallery,
         },
       },
-      { new: true } // Returns the updated document
+      { new: true }
     );
 
-    // 7. Respond with success message
     sendSuccessResponse(
       res,
       "Product photos uploaded successfully",
       200,
       newGallery
     );
-
-    // 8. Remove the photos from server
-    photosPath.map((photoPath) => {
-      fs.unlinkSync(photoPath);
-    });
   } catch (error) {
     next(error);
   }

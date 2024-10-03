@@ -18,8 +18,8 @@ const {
   checkUniquePhone,
   checkUniquePhoneExceptThisUser,
 } = require("../middlewares/checkUniquePhone");
-const { photoUpload } = require("../middlewares/photoUpload");
 const multerErrorHandler = require("../utilities/multerErrorHandler");
+const { imageUpload } = require("../middlewares/imageUpload");
 
 const router = express.Router();
 
@@ -43,7 +43,7 @@ router.patch(
 router.patch(
   "/user-photo-upload",
   verifyToken,
-  photoUpload.single("avatar"),
+  imageUpload.single("avatar"),
   userPhotoUpload
 );
 
