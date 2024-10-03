@@ -1,9 +1,8 @@
 const formatJoiErrors = (error) => {
-  return error.details.map((err) => ({
-    [err.context.key]: {
-      message: err.message,
-    },
-  }));
+  return error.details.reduce((errors, detail) => {
+    errors[detail.context.key] = { message: detail.message };
+    return errors;
+  }, {});
 };
 
 module.exports = formatJoiErrors;
