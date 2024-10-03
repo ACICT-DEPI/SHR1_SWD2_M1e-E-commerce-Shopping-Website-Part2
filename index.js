@@ -9,32 +9,34 @@ const adminRoute = require("./routes/adminRoute");
 const carouselRoute = require("./routes/carouselRoute");
 const app = express();
 const cors = require("cors");
+const morgan = require("morgan");
+
 app.use(express.json());
+const API_URL = process.env.API_URL;
 const PORT = process.env.PORT;
 const URL = process.env.MONGO_URL;
 
 app.use(cors());
+app.use(morgan("tiny"));
 
 app.get("/", (req, res) => {
   res.send("Backend server is running");
 });
 
-app.use("/categories", categoryRoute);
-
-app.use("/products", productRoute);
-
-app.use("/users", userRoute);
-
-app.use("/admins", adminRoute);
-
-app.use("/carousels", carouselRoute);
+app.use(`${API_URL}/categories`, categoryRoute);
+app.use(`${API_URL}/products`, productRoute);
+app.use(`${API_URL}/users`, userRoute);
+app.use(`${API_URL}/admins`, adminRoute);
+app.use(`${API_URL}/carousels`, carouselRoute);
 
 app.all("*", (req, res) => {
   return sendErrorResponse(res, "Resource Not Found", 404);
 });
 
 mongoose
-  .connect(URL)
+  .connect(URL, {
+    serverSelectionTimeoutMS: 5000, // Increase the timeout duration
+  })
   .then(() => {
     console.log("App connected to database");
     app.listen(PORT, () => {
