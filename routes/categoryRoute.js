@@ -15,6 +15,10 @@ const allowedTo = require("../middlewares/allowedTo");
 const userRole = require("../utilities/userRoles");
 const multerErrorHandler = require("../utilities/multerErrorHandler");
 const { imageUpload } = require("../middlewares/imageUpload");
+const {
+  checkUniqueCategory,
+  checkUniqueCategoryExceptThisCategory,
+} = require("../middlewares/checkUniqueCategory");
 
 const router = express.Router();
 
@@ -22,6 +26,7 @@ router.post(
   "/",
   verifyToken,
   allowedTo(userRole.ADMIN),
+  checkUniqueCategory,
   validateCategory,
   addCategory
 );
@@ -41,6 +46,7 @@ router.patch(
   "/:id",
   verifyToken,
   allowedTo(userRole.ADMIN),
+  checkUniqueCategoryExceptThisCategory,
   validateCategory,
   updateCategory
 );
