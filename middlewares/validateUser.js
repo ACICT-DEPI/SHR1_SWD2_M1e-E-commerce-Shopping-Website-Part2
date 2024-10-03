@@ -42,16 +42,12 @@ const validateUserSchema = (data) => {
     phone: Joi.string()
       .trim()
       .pattern(/^[0-9]{10,15}$/)
-      .min(10)
-      .max(15)
       .required()
       .messages({
         "string.base": "Phone number must be a string",
         "string.empty": "Phone number is required",
         "string.pattern.base":
-          "Phone number must be valid, It must be contains only numbers",
-        "string.min": "Phone number should be at least 10 characters long",
-        "string.max": "Phone number should be at most 15 characters long",
+          "Phone number must be valid, It must be contains only numbers between 10 and 15",
         "any.required": "Phone number is required",
       }),
     password: Joi.string()
@@ -101,15 +97,11 @@ const validateUpdateUserSchema = (data) => {
     phone: Joi.string()
       .trim()
       .pattern(/^[0-9]{10,15}$/)
-      .min(10)
-      .max(15)
       .messages({
         "string.base": "Phone number must be a string",
         "string.empty": "Phone number is required",
         "string.pattern.base":
-          "Phone number must be valid, It must be contains only numbers",
-        "string.min": "Phone number should be at least 10 characters long",
-        "string.max": "Phone number should be at most 15 characters long",
+          "Phone number must be valid, It must be contains only numbers between 10 and 15",
       }),
     password: Joi.string()
       .pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/)
