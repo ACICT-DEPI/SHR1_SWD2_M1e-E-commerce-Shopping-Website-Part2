@@ -8,7 +8,9 @@ const checkUniquePhone = async (req, res, next) => {
   });
   if (existingUser) {
     return sendErrorResponse(res, "Phone is already existing", 500, {
-      message: "Phone is already existing",
+      phone: {
+        message: "Phone is already existing",
+      },
     });
   }
   next();
@@ -22,7 +24,9 @@ const checkUniquePhoneExceptThisUser = async (req, res, next) => {
   });
   if (existingUser) {
     return sendErrorResponse(res, "Phone is already existing", 500, {
-      message: "Phone is already existing",
+      phone: {
+        message: "Phone is already existing",
+      },
     });
   }
   next();

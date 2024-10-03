@@ -6,7 +6,9 @@ const verifyToken = (req, res, next) => {
     req.headers["Authorization"] || req.headers["authorization"];
   if (!authHeader) {
     return sendErrorResponse(res, "Token is require", 401, {
-      message: "Token is require",
+      token: {
+        message: "Token is require",
+      },
     });
   }
   const token = authHeader.split(" ")[1];
@@ -16,7 +18,9 @@ const verifyToken = (req, res, next) => {
     next();
   } catch (err) {
     return sendErrorResponse(res, "Invalid token", 401, {
-      message: "Invalid token",
+      token: {
+        message: "Invalid token",
+      },
     });
   }
 };

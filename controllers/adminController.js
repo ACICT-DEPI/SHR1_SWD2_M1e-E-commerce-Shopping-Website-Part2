@@ -26,7 +26,9 @@ const getAllUsers = asyncWrapper(async (req, res) => {
 const getUser = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid user ID", 404, {
-      message: "Invalid user ID",
+      user: {
+        message: "Invalid user ID",
+      },
     });
   }
 
@@ -36,7 +38,9 @@ const getUser = asyncWrapper(async (req, res) => {
   });
   if (!user) {
     return sendErrorResponse(res, "User not found", 404, {
-      message: "User not found",
+      user: {
+        message: "User not found",
+      },
     });
   }
   sendSuccessResponse(res, "User fetched successfully", 200, user);

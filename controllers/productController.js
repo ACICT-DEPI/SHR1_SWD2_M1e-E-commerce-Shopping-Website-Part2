@@ -17,13 +17,17 @@ const {
 const addProduct = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.body.category)) {
     return sendErrorResponse(res, "Invalid category ID", 404, {
-      message: "Invalid category ID",
+      category: {
+        message: "Invalid category ID",
+      },
     });
   }
 
   if (!(await checkIfCategoryExists(req.body.category))) {
     return sendErrorResponse(res, "Category not found", 404, {
-      message: "Category not found",
+      category: {
+        message: "Category not found",
+      },
     });
   }
 
@@ -55,13 +59,17 @@ const getProducts = asyncWrapper(async (req, res) => {
     for (const category of categories) {
       if (!checkIfIdIsValid(category)) {
         return sendErrorResponse(res, "Invalid category ID", 404, {
-          message: "Invalid category ID",
+          category: {
+            message: "Invalid category ID",
+          },
         });
       }
 
       if (!(await checkIfCategoryExists(category))) {
         return sendErrorResponse(res, "Category not found", 404, {
-          message: "Category not found",
+          category: {
+            message: "Category not found",
+          },
         });
       }
     }
@@ -111,14 +119,18 @@ const getFeaturedProducts = asyncWrapper(async (req, res) => {
 const getProduct = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid product ID", 404, {
-      message: "Invalid product ID",
+      product: {
+        message: "Invalid product ID",
+      },
     });
   }
 
   const product = await Product.findById(req.params.id).populate("category");
   if (!product) {
     return sendErrorResponse(res, "Product not found", 404, {
-      message: "Product not found",
+      product: {
+        message: "Product not found",
+      },
     });
   }
   sendSuccessResponse(res, "Product fetched successfully", 200, product);
@@ -127,20 +139,26 @@ const getProduct = asyncWrapper(async (req, res) => {
 const updateProduct = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid product ID", 404, {
-      message: "Invalid product ID",
+      product: {
+        message: "Invalid product ID",
+      },
     });
   }
 
   if (req.body.category) {
     if (!checkIfIdIsValid(req.body.category)) {
       return sendErrorResponse(res, "Invalid category ID", 404, {
-        message: "Invalid category ID",
+        category: {
+          message: "Invalid category ID",
+        },
       });
     }
 
     if (!(await checkIfCategoryExists(req.body.category))) {
       return sendErrorResponse(res, "Category not found", 404, {
-        message: "Category not found",
+        category: {
+          message: "Category not found",
+        },
       });
     }
   }
@@ -154,7 +172,9 @@ const updateProduct = asyncWrapper(async (req, res) => {
   );
   if (!updatedProduct) {
     return sendErrorResponse(res, "Product not found", 404, {
-      message: "Product not found",
+      product: {
+        message: "Product not found",
+      },
     });
   }
   sendSuccessResponse(res, "Product updated successfully", 200, updatedProduct);
@@ -163,14 +183,18 @@ const updateProduct = asyncWrapper(async (req, res) => {
 const productPhotosUpload = async (req, res, next) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid product ID", 404, {
-      message: "Invalid product ID",
+      product: {
+        message: "Invalid product ID",
+      },
     });
   }
 
   const product = await Product.findById(req.params.id);
   if (!product) {
     return sendErrorResponse(res, "Product not found", 404, {
-      message: "Product not found",
+      product: {
+        message: "Product not found",
+      },
     });
   }
 
@@ -181,13 +205,17 @@ const productPhotosUpload = async (req, res, next) => {
         "At least one image must be uploaded.",
         400,
         {
-          message: "At least one image must be uploaded.",
+          file: {
+            message: "At least one image must be uploaded.",
+          },
         }
       );
     }
     if (req.files.length > 5) {
       return res.status(400).json({
-        message: "You can only upload up to 5 images.",
+        file: {
+          message: "You can only upload up to 5 images.",
+        },
       });
     }
 
@@ -235,7 +263,9 @@ const productPhotosUpload = async (req, res, next) => {
 const deleteProduct = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid product ID", 404, {
-      message: "Invalid product ID",
+      product: {
+        message: "Invalid product ID",
+      },
     });
   }
 
@@ -254,7 +284,9 @@ const deleteProduct = asyncWrapper(async (req, res) => {
   const deletedProduct = await Product.findByIdAndDelete(req.params.id);
   if (!deletedProduct) {
     return sendErrorResponse(res, "Product not found", 404, {
-      message: "Product not found",
+      product: {
+        message: "Product not found",
+      },
     });
   }
   sendSuccessResponse(res, "Product deleted successfully", 200);

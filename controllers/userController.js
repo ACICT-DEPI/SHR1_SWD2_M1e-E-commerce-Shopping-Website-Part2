@@ -35,7 +35,9 @@ const update = asyncWrapper(async (req, res) => {
   );
   if (!updatedUser) {
     return sendErrorResponse(res, "User not found", 404, {
-      message: "User not found",
+      user: {
+        message: "User not found",
+      },
     });
   }
   sendSuccessResponse(res, "User updated successfully", 200, updatedUser);
@@ -45,7 +47,9 @@ const userPhotoUpload = async (req, res, next) => {
   try {
     if (!req.file) {
       return sendErrorResponse(res, "No file uploaded", 400, {
-        message: "No file uploaded",
+        file: {
+          message: "No file uploaded",
+        },
       });
     }
 

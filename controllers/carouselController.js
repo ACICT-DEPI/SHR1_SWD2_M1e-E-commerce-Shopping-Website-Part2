@@ -14,13 +14,17 @@ const {
 const addCarousel = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.body.category)) {
     return sendErrorResponse(res, "Invalid category ID", 404, {
-      message: "Invalid category ID",
+      category: {
+        message: "Invalid category ID",
+      },
     });
   }
 
   if (!(await checkIfCategoryExists(req.body.category))) {
     return sendErrorResponse(res, "Category not found", 404, {
-      message: "Category not found",
+      category: {
+        message: "Category not found",
+      },
     });
   }
   const newCarousel = new Carousel({
@@ -54,14 +58,18 @@ const getCarousels = asyncWrapper(async (req, res) => {
 const getCarousel = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid carousel ID", 404, {
-      message: "Invalid carousel ID",
+      carousel: {
+        message: "Invalid carousel ID",
+      },
     });
   }
 
   const carousel = await Carousel.findById(req.params.id).populate("category");
   if (!carousel) {
     return sendErrorResponse(res, "Carousel not found", 404, {
-      message: "Carousel not found",
+      carousel: {
+        message: "Carousel not found",
+      },
     });
   }
   sendSuccessResponse(res, "Carousel fetched successfully", 200, carousel);
@@ -70,7 +78,9 @@ const getCarousel = asyncWrapper(async (req, res) => {
 const updateCarousel = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid carousel ID", 404, {
-      message: "Invalid carousel ID",
+      carousel: {
+        message: "Invalid carousel ID",
+      },
     });
   }
 
@@ -83,7 +93,9 @@ const updateCarousel = asyncWrapper(async (req, res) => {
   );
   if (!updatedCarousel) {
     return sendErrorResponse(res, "Carousel not found", 404, {
-      message: "Carousel not found",
+      carousel: {
+        message: "Carousel not found",
+      },
     });
   }
   sendSuccessResponse(
@@ -97,21 +109,27 @@ const updateCarousel = asyncWrapper(async (req, res) => {
 const carouselPhotoUpload = async (req, res, next) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid carousel ID", 404, {
-      message: "Invalid carousel ID",
+      carousel: {
+        message: "Invalid carousel ID",
+      },
     });
   }
 
   const carousel = await Carousel.findById(req.params.id);
   if (!carousel) {
     return sendErrorResponse(res, "Carousel not found", 404, {
-      message: "Carousel not found",
+      carousel: {
+        message: "Carousel not found",
+      },
     });
   }
 
   try {
     if (!req.file) {
       return sendErrorResponse(res, "No file uploaded", 400, {
-        message: "No file uploaded",
+        file: {
+          message: "No file uploaded",
+        },
       });
     }
 
@@ -146,14 +164,18 @@ const carouselPhotoUpload = async (req, res, next) => {
 const deleteCarousel = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid carousel ID", 404, {
-      message: "Invalid carousel ID",
+      carousel: {
+        message: "Invalid carousel ID",
+      },
     });
   }
 
   const carousel = await Carousel.findById(req.params.id);
   if (!carousel) {
     return sendErrorResponse(res, "Carousel not found", 404, {
-      message: "Carousel not found",
+      carousel: {
+        message: "Carousel not found",
+      },
     });
   }
 

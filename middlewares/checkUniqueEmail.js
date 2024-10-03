@@ -8,7 +8,9 @@ const checkUniqueEmail = async (req, res, next) => {
   });
   if (existingUser) {
     return sendErrorResponse(res, "Email is already existing", 500, {
-      message: "Email is already existing",
+      email: {
+        message: "Email is already existing",
+      },
     });
   }
   next();
@@ -22,7 +24,9 @@ const checkUniqueEmailExceptThisUser = async (req, res, next) => {
   });
   if (existingUser) {
     return sendErrorResponse(res, "Email is already existing", 500, {
-      message: "Email is already existing",
+      email: {
+        message: "Email is already existing",
+      },
     });
   }
   next();

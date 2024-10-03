@@ -9,7 +9,9 @@ const checkUniqueCategory = async (req, res, next) => {
   });
   if (existingCategory) {
     return sendErrorResponse(res, "Category is already existing", 500, {
-      message: "Category is already existing",
+      category: {
+        message: "Category is already existing",
+      },
     });
   }
   next();
@@ -18,7 +20,9 @@ const checkUniqueCategory = async (req, res, next) => {
 const checkUniqueCategoryExceptThisCategory = async (req, res, next) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid category ID", 404, {
-      message: "Invalid category ID",
+      category: {
+        message: "Invalid category ID",
+      },
     });
   }
   const { title } = req.body;
@@ -28,7 +32,9 @@ const checkUniqueCategoryExceptThisCategory = async (req, res, next) => {
   });
   if (existingCategory) {
     return sendErrorResponse(res, "Category is already existing", 500, {
-      message: "Category is already existing",
+      category: {
+        message: "Category is already existing",
+      },
     });
   }
   next();

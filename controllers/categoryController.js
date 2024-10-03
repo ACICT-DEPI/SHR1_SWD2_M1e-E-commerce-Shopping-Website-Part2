@@ -47,14 +47,18 @@ const getNumberOfCategories = asyncWrapper(async (req, res) => {
 const getCategory = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid category ID", 404, {
-      message: "Invalid category ID",
+      category: {
+        message: "Invalid category ID",
+      },
     });
   }
 
   const category = await Category.findById(req.params.id);
   if (!category) {
     return sendErrorResponse(res, "Category not found", 404, {
-      message: "Category not found",
+      category: {
+        message: "Category not found",
+      },
     });
   }
   sendSuccessResponse(res, "Category fetched successfully", 200, category);
@@ -70,7 +74,9 @@ const updateCategory = asyncWrapper(async (req, res) => {
   );
   if (!updatedCategory) {
     return sendErrorResponse(res, "Category not found", 404, {
-      message: "Category not found",
+      category: {
+        message: "Category not found",
+      },
     });
   }
   sendSuccessResponse(
@@ -84,21 +90,27 @@ const updateCategory = asyncWrapper(async (req, res) => {
 const categoryPhotoUpload = async (req, res, next) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid category ID", 404, {
-      message: "Invalid category ID",
+      category: {
+        message: "Invalid category ID",
+      },
     });
   }
 
   const category = await Category.findById(req.params.id);
   if (!category) {
     return sendErrorResponse(res, "Category not found", 404, {
-      message: "Category not found",
+      category: {
+        message: "Category not found",
+      },
     });
   }
 
   try {
     if (!req.file) {
       return sendErrorResponse(res, "No file uploaded", 400, {
-        message: "No file uploaded",
+        file: {
+          message: "No file uploaded",
+        },
       });
     }
 
@@ -133,7 +145,9 @@ const categoryPhotoUpload = async (req, res, next) => {
 const deleteCategory = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid category ID", 404, {
-      message: "Invalid category ID",
+      category: {
+        message: "Invalid category ID",
+      },
     });
   }
 
@@ -141,7 +155,9 @@ const deleteCategory = asyncWrapper(async (req, res) => {
 
   if (!category) {
     return sendErrorResponse(res, "Category not found", 404, {
-      message: "Category not found",
+      category: {
+        message: "Category not found",
+      },
     });
   }
 
