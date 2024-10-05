@@ -25,18 +25,18 @@ const router = express.Router();
 
 router.post(
   "/register",
+  validateUser,
   checkUniqueEmail,
   checkUniquePhone,
-  validateUser,
   register
 );
 
 router.patch(
   "/update",
   verifyToken,
+  validateUpdateUser,
   checkUniqueEmailExceptThisUser,
   checkUniquePhoneExceptThisUser,
-  validateUpdateUser,
   update
 );
 

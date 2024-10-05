@@ -26,8 +26,8 @@ router.post(
   "/",
   verifyToken,
   allowedTo(userRole.ADMIN),
-  checkUniqueCategory,
   validateCategory,
+  checkUniqueCategory,
   addCategory
 );
 
@@ -46,8 +46,8 @@ router.patch(
   "/:id",
   verifyToken,
   allowedTo(userRole.ADMIN),
-  checkUniqueCategoryExceptThisCategory,
   validateCategory,
+  checkUniqueCategoryExceptThisCategory,
   updateCategory
 );
 

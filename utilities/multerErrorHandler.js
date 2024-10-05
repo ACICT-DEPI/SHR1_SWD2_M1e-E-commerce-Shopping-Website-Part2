@@ -50,8 +50,8 @@ const multerErrorHandler = (err, req, res, next) => {
     }
 
     // Handle other Multer errors (if any)
-    return sendErrorResponse(res, "File upload failed.", 500, {
-      message: "File upload failed",
+    return sendErrorResponse(res, "There is an error", 500, {
+      message: "There is an error",
       error: err,
     });
   }

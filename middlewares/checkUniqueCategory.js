@@ -1,6 +1,5 @@
 const Category = require("../models/categoryModel");
 const { sendErrorResponse } = require("../utilities/sendResponse");
-const checkIfIdIsValid = require("./checkIfIdIsValid");
 
 const checkUniqueCategory = async (req, res, next) => {
   const { title } = req.body;
@@ -18,13 +17,6 @@ const checkUniqueCategory = async (req, res, next) => {
 };
 
 const checkUniqueCategoryExceptThisCategory = async (req, res, next) => {
-  if (!checkIfIdIsValid(req.params.id)) {
-    return sendErrorResponse(res, "Invalid category ID", 404, {
-      category: {
-        message: "Invalid category ID",
-      },
-    });
-  }
   const { title } = req.body;
   const existingCategory = await Category.findOne({
     title: title,

@@ -65,6 +65,14 @@ const getCategory = asyncWrapper(async (req, res) => {
 });
 
 const updateCategory = asyncWrapper(async (req, res) => {
+  if (!checkIfIdIsValid(req.params.id)) {
+    return sendErrorResponse(res, "Invalid category ID", 404, {
+      category: {
+        message: "Invalid category ID",
+      },
+    });
+  }
+
   const updatedCategory = await Category.findByIdAndUpdate(
     req.params.id,
     {

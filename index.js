@@ -9,6 +9,7 @@ const adminRoute = require("./routes/adminRoute");
 const carouselRoute = require("./routes/carouselRoute");
 const app = express();
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 
 app.use(express.json());
@@ -16,6 +17,7 @@ const API_URL = process.env.API_URL;
 const PORT = process.env.PORT;
 const URL = process.env.MONGO_URL;
 
+app.use(cookieParser());
 app.use(cors());
 app.use(morgan("tiny"));
 

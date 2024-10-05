@@ -109,8 +109,17 @@ const login = asyncWrapper(async (req, res, next) => {
     email: user.email,
     role: user.role,
   });
-  // If credentials are correct, respond with success
-  sendSuccessResponse(res, "Token generated", 200, { token });
+
+  // Set token as an HTTP-only cookie with expiration (e.g., 1 hour)
+  res.cookie("token", token, {
+    httpOnly: true,
+    // secure: process.env.NODE_ENV === "production",
+    sameSite: "None",
+    maxAge: 60 * 60 * 1000, // 1 hour
+  });
+
+  // Send success response
+  sendSuccessResponse(res, "Logged in successfully", 200, { token });
 });
 
 module.exports = {
