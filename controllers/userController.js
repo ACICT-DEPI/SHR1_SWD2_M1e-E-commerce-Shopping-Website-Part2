@@ -113,9 +113,9 @@ const login = asyncWrapper(async (req, res, next) => {
   // Set token as an HTTP-only cookie with expiration (e.g., 1 hour)
   res.cookie("token", token, {
     httpOnly: true,
-    // secure: process.env.NODE_ENV === "production",
-    sameSite: "None",
+    secure: false,
     maxAge: 60 * 60 * 1000, // 1 hour
+    path: "/",
   });
 
   // Send success response

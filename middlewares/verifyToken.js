@@ -2,20 +2,22 @@ const jwt = require("jsonwebtoken");
 const { sendErrorResponse } = require("../utilities/sendResponse");
 
 const verifyToken = (req, res, next) => {
-  const authHeader =
-    req.headers["Authorization"] || req.headers["authorization"];
-  if (!authHeader) {
-    return sendErrorResponse(res, "Token is require", 401, {
+  const token = req.cookies.token;
+
+  // Check if the token exists in the cookies
+  if (!token) {
+    return sendErrorResponse(res, "Token is required", 401, {
       token: {
-        message: "Token is require",
+        message: "Token is required",
       },
     });
   }
-  const token = authHeader.split(" ")[1];
+
   try {
+    // Verify the token using your secret key
     const currentUser = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.currentUser = currentUser;
-    next();
+    req.currentUser = currentUser; // Add user data to the request object
+    next(); // Proceed to the next middleware
   } catch (err) {
     return sendErrorResponse(res, "Invalid token", 401, {
       token: {
