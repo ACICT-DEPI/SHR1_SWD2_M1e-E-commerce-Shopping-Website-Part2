@@ -4,6 +4,7 @@ const {
   login,
   update,
   userPhotoUpload,
+  getProfile,
 } = require("../controllers/userController");
 const verifyToken = require("../middlewares/verifyToken");
 const {
@@ -30,6 +31,8 @@ router.post(
   checkUniquePhone,
   register
 );
+
+router.get("/profile", verifyToken, getProfile);
 
 router.patch(
   "/update",

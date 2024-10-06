@@ -24,7 +24,35 @@ const register = asyncWrapper(async (req, res) => {
   sendSuccessResponse(res, "Successfully registered", 200, newUser);
 });
 
+const getProfile = asyncWrapper(async (req, res) => {
+  const userProfile = await User.findById(req.currentUser.id, {
+    _id: false,
+    firstName: true,
+    lastName: true,
+    email: true,
+    phone: true,
+    avatar: true,
+  });
+  if (!userProfile) {
+    sendErrorResponse(res, "User not found", 404, {
+      user: { message: "User not found" },
+    });
+  }
+  sendSuccessResponse(
+    res,
+    "User profile retrieved successfully",
+    200,
+    userProfile
+  );
+});
+
 const update = asyncWrapper(async (req, res) => {
+  const user = await User.findById(req.currentUser.id);
+  if (!user) {
+    sendErrorResponse(res, "User not found", 404, {
+      user: { message: "User not found" },
+    });
+  }
   const updatedUser = await User.findByIdAndUpdate(
     req.currentUser.id,
     req.body,
@@ -44,6 +72,13 @@ const update = asyncWrapper(async (req, res) => {
 });
 
 const userPhotoUpload = async (req, res, next) => {
+  const user = await User.findById(req.currentUser.id);
+  if (!user) {
+    sendErrorResponse(res, "User not found", 404, {
+      user: { message: "User not found" },
+    });
+  }
+
   try {
     if (!req.file) {
       return sendErrorResponse(res, "No file uploaded", 400, {
@@ -54,8 +89,6 @@ const userPhotoUpload = async (req, res, next) => {
     }
 
     const result = await uploadToCloudinary(req.file.buffer);
-
-    const user = await User.findById(req.currentUser.id);
 
     if (user.avatar.public_id !== null) {
       await removeFromCloudinary(user.avatar.public_id);
@@ -124,6 +157,7 @@ const login = asyncWrapper(async (req, res, next) => {
 
 module.exports = {
   register,
+  getProfile,
   update,
   userPhotoUpload,
   login,
