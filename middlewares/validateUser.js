@@ -103,13 +103,6 @@ const validateUpdateUserSchema = (data) => {
         "string.pattern.base":
           "Phone number must be valid, It must be contains only numbers between 10 and 15",
       }),
-    password: Joi.string()
-      .pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/)
-      .messages({
-        "string.empty": "Password cannot be empty", // Added this for empty string validation
-        "string.pattern.base":
-          "Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character (@, $, !, %, &, ?, #, &).",
-      }),
   });
   return schema.validate(data, { abortEarly: false }); // Capture all errors
 };

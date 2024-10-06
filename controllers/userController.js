@@ -13,12 +13,13 @@ const {
 
 const register = asyncWrapper(async (req, res) => {
   const { firstName, lastName, email, phone, password } = req.body;
+  hashedPassword = await bcrypt.hash(password, 10); // Hash password with bcrypt
   const newUser = new User({
     firstName,
     lastName,
     email,
     phone,
-    password,
+    password: hashedPassword,
   });
   await newUser.save();
   sendSuccessResponse(res, "Successfully registered", 200, newUser);
@@ -69,6 +70,54 @@ const update = asyncWrapper(async (req, res) => {
     });
   }
   sendSuccessResponse(res, "User updated successfully", 200, updatedUser);
+});
+
+const changePassword = asyncWrapper(async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  // Find the user by their ID (from req.currentUser)
+  const user = await User.findById(req.currentUser.id).select("+password");
+
+  if (!user) {
+    return sendErrorResponse(res, "User not found", 404, {
+      user: { message: "User not found" },
+    });
+  }
+
+  // Check if the current password matches
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+  if (!isMatch) {
+    return sendErrorResponse(res, "Current password is incorrect", 400, {
+      currentPassword: {
+        message: "Current password is incorrect",
+      },
+    });
+  }
+
+  hashedPassword = await bcrypt.hash(newPassword, 10); // Hash password with bcrypt
+
+  const updatePassword = awaitUser.findByIdAndUpdate(
+    req.currentUser.id,
+    {
+      $set: {
+        password: hashedPassword,
+      },
+    },
+    { new: true }
+  );
+
+  if (!updatePassword) {
+    return sendErrorResponse(res, "Password not changed", 404, {
+      user: { message: "Password not changed" },
+    });
+  }
+
+  // Send success response
+  sendSuccessResponse(res, "Password changed successfully", 200, {
+    password: {
+      message: "Password changed successfully",
+    },
+  });
 });
 
 const userPhotoUpload = async (req, res, next) => {
@@ -152,7 +201,21 @@ const login = asyncWrapper(async (req, res, next) => {
   });
 
   // Send success response
-  sendSuccessResponse(res, "Logged in successfully", 200, { token });
+  sendSuccessResponse(res, "Logged in successfully", 200, {
+    message: "Logged in successfully",
+  });
+});
+
+const logout = asyncWrapper(async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    path: "/",
+  });
+
+  sendSuccessResponse(res, "Logged out successfully", 200, {
+    message: "Logged out successfully",
+  });
 });
 
 module.exports = {
@@ -160,5 +223,7 @@ module.exports = {
   getProfile,
   update,
   userPhotoUpload,
+  changePassword,
   login,
+  logout,
 };

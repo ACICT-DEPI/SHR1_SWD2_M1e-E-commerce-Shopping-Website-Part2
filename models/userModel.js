@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+
 const userRole = require("../utilities/userRoles");
 
 const userSchema = new mongoose.Schema(
@@ -49,11 +49,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       trim: true,
-      minlength: [8, "Password must be at least 8 characters long"],
-      match: [
-        /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/,
-        "Password must contain at least one uppercase letter, one number, and one special character (@, $, !, %, &, ?, #, &).",
-      ],
     },
     role: {
       type: String,
@@ -80,13 +75,5 @@ const userSchema = new mongoose.Schema(
     autoIndex: true,
   }
 );
-
-// Optional: Pre-save hook to hash the password before saving it
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 10); // Hash password with bcrypt
-  }
-  next();
-});
 
 module.exports = mongoose.model("User", userSchema);
