@@ -19,11 +19,19 @@ const verifyToken = (req, res, next) => {
     req.currentUser = currentUser; // Add user data to the request object
     next(); // Proceed to the next middleware
   } catch (err) {
-    return sendErrorResponse(res, "Invalid token", 401, {
-      token: {
-        message: "Invalid token",
-      },
-    });
+    if (err.name === "TokenExpiredError") {
+      return sendErrorResponse(res, "Invalid is expired", 401, {
+        token: {
+          message: "Invalid is expired",
+        },
+      });
+    } else {
+      return sendErrorResponse(res, "Invalid token", 401, {
+        token: {
+          message: "Invalid token",
+        },
+      });
+    }
   }
 };
 
