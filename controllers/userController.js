@@ -96,7 +96,7 @@ const changePassword = asyncWrapper(async (req, res) => {
 
   hashedPassword = await bcrypt.hash(newPassword, 10); // Hash password with bcrypt
 
-  const updatePassword = awaitUser.findByIdAndUpdate(
+  const updatePassword = await User.findByIdAndUpdate(
     req.currentUser.id,
     {
       $set: {
@@ -117,6 +117,20 @@ const changePassword = asyncWrapper(async (req, res) => {
     password: {
       message: "Password changed successfully",
     },
+  });
+});
+
+const sendForgetPassword = asyncWrapper(async (req, res, next) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    return sendErrorResponse(res, "User not found", 404, {
+      user: { message: "User not found" },
+    });
+  }
+  const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "15m",
   });
 });
 
