@@ -2,7 +2,7 @@ const asyncWrapper = require("../middlewares/asyncWrapper");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const sendPasswordResetEmail = require("../utilities/nodemailer");
 const generateJWT = require("../utilities/generateJWT");
 const {
   sendErrorResponse,
@@ -136,33 +136,12 @@ const sendForgetPasswordLink = asyncWrapper(async (req, res, next) => {
 
   const resetLink = `http://localhost:5000/api/v1/users/password/reset-password/${user._id}/${resetToken}`;
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_ADDRESS,
-      pass: process.env.EMAIL_PASSWORD,
-    },
+  sendPasswordResetEmail(user.email, resetLink);
+
+  res.json({
+    message: "Click on the link to reset your password",
+    resetLink: resetLink,
   });
-
-  const mailOptions = {
-    from: process.env.EMAIL_ADDRESS,
-    to: user.email,
-    subject: "Reset Password",
-    text: `You requested to reset your password. Click on the following link to complete the process: ${resetLink}`,
-  };
-
-  try {
-    const success = await transporter.sendMail(mailOptions);
-    console.log("Email sent: " + success.response);
-
-    res.json({
-      message: "Click on the link to reset your password",
-      resetLink: resetLink,
-    });
-  } catch (error) {
-    console.error("Error sending email:", error);
-    return sendErrorResponse(res, "Error sending reset email", 500);
-  }
 });
 
 const getResetPassword = asyncWrapper(async (req, res, next) => {
