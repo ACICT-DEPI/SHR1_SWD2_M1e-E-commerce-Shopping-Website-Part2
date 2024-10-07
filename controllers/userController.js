@@ -131,16 +131,15 @@ const sendForgetPasswordLink = asyncWrapper(async (req, res, next) => {
 
   const secret = process.env.JWT_SECRET_KEY + user.password;
   const resetToken = jwt.sign({ id: user._id, email: user.email }, secret, {
-    expiresIn: "10m",
+    expiresIn: "20m",
   });
 
-  const resetLink = `http://localhost:5000/api/v1/users/password/reset-password/${user._id}/${resetToken}`;
+  const resetLink = `http://localhost:3000/password/reset-password/${user._id}/${resetToken}`;
 
   sendPasswordResetEmail(user.email, resetLink);
 
   res.json({
-    message: "Click on the link to reset your password",
-    resetLink: resetLink,
+    message: "The link sent successfully",
   });
 });
 
