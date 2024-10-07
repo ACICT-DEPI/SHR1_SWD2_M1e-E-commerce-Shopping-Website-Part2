@@ -1,6 +1,8 @@
 const asyncWrapper = require("../middlewares/asyncWrapper");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
 const generateJWT = require("../utilities/generateJWT");
 const {
   sendErrorResponse,
@@ -10,6 +12,7 @@ const {
   removeFromCloudinary,
   uploadToCloudinary,
 } = require("../utilities/cloudinaryCloud");
+const checkIfIdIsValid = require("../middlewares/checkIfIdIsValid");
 
 const register = asyncWrapper(async (req, res) => {
   const { firstName, lastName, email, phone, password } = req.body;
@@ -96,21 +99,8 @@ const changePassword = asyncWrapper(async (req, res) => {
 
   hashedPassword = await bcrypt.hash(newPassword, 10); // Hash password with bcrypt
 
-  const updatePassword = await User.findByIdAndUpdate(
-    req.currentUser.id,
-    {
-      $set: {
-        password: hashedPassword,
-      },
-    },
-    { new: true }
-  );
-
-  if (!updatePassword) {
-    return sendErrorResponse(res, "Password not changed", 404, {
-      user: { message: "Password not changed" },
-    });
-  }
+  user.password = hashedPassword;
+  user.save();
 
   // Send success response
   sendSuccessResponse(res, "Password changed successfully", 200, {
@@ -120,18 +110,134 @@ const changePassword = asyncWrapper(async (req, res) => {
   });
 });
 
-const sendForgetPassword = asyncWrapper(async (req, res, next) => {
+const sendForgetPasswordLink = asyncWrapper(async (req, res, next) => {
   const { email } = req.body;
 
+  if (!email) {
+    return sendErrorResponse(res, "Please provide an email", 400, {
+      email: {
+        message: "Please provide an email",
+      },
+    });
+  }
+
   const user = await User.findOne({ email });
+
   if (!user) {
     return sendErrorResponse(res, "User not found", 404, {
       user: { message: "User not found" },
     });
   }
-  const resetToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "15m",
+
+  const secret = process.env.JWT_SECRET_KEY + user.password;
+  const resetToken = jwt.sign({ id: user._id, email: user.email }, secret, {
+    expiresIn: "10m",
   });
+
+  const resetLink = `http://localhost:5000/api/v1/users/password/reset-password/${user._id}/${resetToken}`;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_ADDRESS,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_ADDRESS,
+    to: user.email,
+    subject: "Reset Password",
+    text: `You requested to reset your password. Click on the following link to complete the process: ${resetLink}`,
+  };
+
+  try {
+    const success = await transporter.sendMail(mailOptions);
+    console.log("Email sent: " + success.response);
+
+    res.json({
+      message: "Click on the link to reset your password",
+      resetLink: resetLink,
+    });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return sendErrorResponse(res, "Error sending reset email", 500);
+  }
+});
+
+const getResetPassword = asyncWrapper(async (req, res, next) => {
+  if (!checkIfIdIsValid(req.params.userId)) {
+    return sendErrorResponse(res, "Invalid user ID", 404, {
+      user: {
+        message: "Invalid user ID",
+      },
+    });
+  }
+
+  const user = await User.findById(req.params.userId);
+
+  if (!user) {
+    return sendErrorResponse(res, "User not found", 404, {
+      user: { message: "User not found" },
+    });
+  }
+
+  const secret = process.env.JWT_SECRET_KEY + user.password;
+  try {
+    jwt.verify(req.params.resetToken, secret);
+    sendSuccessResponse(
+      res,
+      "Page of reset password loaded successfully",
+      200,
+      { email: user.email }
+    );
+  } catch (err) {
+    return sendErrorResponse(res, "Token expired or invalid", 401, {
+      token: {
+        message: "Token expired or invalid",
+      },
+    });
+  }
+});
+
+const resetThePassword = asyncWrapper(async (req, res, next) => {
+  if (!checkIfIdIsValid(req.params.userId)) {
+    return sendErrorResponse(res, "Invalid user ID", 404, {
+      user: {
+        message: "Invalid user ID",
+      },
+    });
+  }
+
+  const user = await User.findById(req.params.userId);
+
+  if (!user) {
+    return sendErrorResponse(res, "User not found", 404, {
+      user: { message: "User not found" },
+    });
+  }
+
+  const secret = process.env.JWT_SECRET_KEY + user.password;
+  try {
+    const { newPassword } = req.body;
+    jwt.verify(req.params.resetToken, secret);
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    sendSuccessResponse(res, "Password reset successfully", 200, {
+      password: {
+        message: "Password reset successfully",
+      },
+    });
+  } catch (err) {
+    return sendErrorResponse(res, "Token expired or invalid", 401, {
+      token: {
+        message: "Token expired or invalid",
+      },
+    });
+  }
 });
 
 const userPhotoUpload = async (req, res, next) => {
@@ -238,6 +344,9 @@ module.exports = {
   update,
   userPhotoUpload,
   changePassword,
+  sendForgetPasswordLink,
+  getResetPassword,
+  resetThePassword,
   login,
   logout,
 };

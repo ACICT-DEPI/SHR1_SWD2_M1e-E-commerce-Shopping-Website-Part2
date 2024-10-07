@@ -7,13 +7,19 @@ const {
   userPhotoUpload,
   getProfile,
   changePassword,
+  sendForgetPasswordLink,
+  getResetPassword,
+  resetThePassword,
 } = require("../controllers/userController");
 const verifyToken = require("../middlewares/verifyToken");
 const {
   validateUser,
   validateUpdateUser,
 } = require("../middlewares/validateUser");
-const { validatePassword } = require("../middlewares/passwordValidation");
+const {
+  validatePassword,
+  validateNewPassword,
+} = require("../middlewares/passwordValidation");
 const {
   checkUniqueEmail,
   checkUniqueEmailExceptThisUser,
@@ -54,6 +60,16 @@ router.patch(
 );
 
 router.patch("/change-password", verifyToken, validatePassword, changePassword);
+
+router.post("/password/forget-password", sendForgetPasswordLink);
+
+router.get("/password/reset-password/:userId/:resetToken", getResetPassword);
+
+router.post(
+  "/password/reset-password/:userId/:resetToken",
+  validateNewPassword,
+  resetThePassword
+);
 
 router.post("/login", login);
 

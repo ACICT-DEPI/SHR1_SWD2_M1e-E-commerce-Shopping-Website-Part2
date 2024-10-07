@@ -12,10 +12,25 @@ const validatePasswordSchema = (data) => {
       .pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/)
       .required()
       .messages({
-        "string.empty": "Password cannot be empty", // Added this for empty string validation
+        "string.empty": "New password cannot be empty", // Added this for empty string validation
         "string.pattern.base":
-          "Password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character (@, $, !, %, &, ?, #, &).",
-        "any.required": "Password is required",
+          "New password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character (@, $, !, %, &, ?, #, &).",
+        "any.required": "New password is required",
+      }),
+  });
+  return schema.validate(data, { abortEarly: false }); // Capture all errors
+};
+
+const validateNewPasswordSchema = (data) => {
+  const schema = Joi.object({
+    newPassword: Joi.string()
+      .pattern(/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?#&])[A-Za-z\d@$!%*?#&]{8,}$/)
+      .required()
+      .messages({
+        "string.empty": "New password cannot be empty", // Added this for empty string validation
+        "string.pattern.base":
+          "New password must be at least 8 characters long, contain at least one uppercase letter, one number, and one special character (@, $, !, %, &, ?, #, &).",
+        "any.required": "New password is required",
       }),
   });
   return schema.validate(data, { abortEarly: false }); // Capture all errors
@@ -33,5 +48,17 @@ const validatePassword = (req, res, next) => {
   }
   next();
 };
+const validateNewPassword = (req, res, next) => {
+  const { error } = validateNewPasswordSchema(req.body);
+  if (error) {
+    return sendErrorResponse(
+      res,
+      "Invalid Password",
+      400,
+      formatJoiErrors(error)
+    );
+  }
+  next();
+};
 
-module.exports = { validatePassword };
+module.exports = { validatePassword, validateNewPassword };
