@@ -22,8 +22,8 @@ const userSchema = new mongoose.Schema(
       minlength: [3, "Last name should be at least 3 characters long"],
       maxlength: [50, "Last name should be at most 50 characters long"],
       match: [
-        /^[a-zA-Z]+$/,
-        "Last name should contain only alphabetic characters",
+        /^[a-zA-Z\s]+$/,
+        "Last name should contain only alphabetic characters and spaces",
       ],
     },
     email: {

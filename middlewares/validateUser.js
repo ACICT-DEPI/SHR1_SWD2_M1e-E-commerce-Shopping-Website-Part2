@@ -77,13 +77,13 @@ const validateUpdateUserSchema = (data) => {
         "string.max": "First name should be at most 50 characters long",
       }),
     lastName: Joi.string()
-      .pattern(/^[a-zA-Z]+$/)
+      .pattern(/^[a-zA-Z\s]+$/)
       .min(3)
       .max(50)
       .messages({
         "string.empty": "Last name cannot be empty", // Added this for empty string validation
         "string.pattern.base":
-          "Last name should contain only alphabetic characters",
+          "Last name should contain only alphabetic characters and spaces",
         "string.min": "Last name should be at least 3 characters long",
         "string.max": "Last name should be at most 50 characters long",
       }),

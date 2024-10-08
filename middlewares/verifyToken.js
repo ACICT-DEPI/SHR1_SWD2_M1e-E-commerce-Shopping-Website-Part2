@@ -7,7 +7,7 @@ const verifyToken = (req, res, next) => {
   // Check if the token exists in the cookies
   if (!token) {
     return sendErrorResponse(res, "Token is required", 401, {
-      token: {
+      auth: {
         message: "Token is required",
       },
     });
@@ -21,13 +21,13 @@ const verifyToken = (req, res, next) => {
   } catch (err) {
     if (err.name === "TokenExpiredError") {
       return sendErrorResponse(res, "Invalid is expired", 401, {
-        token: {
+        auth: {
           message: "Invalid is expired",
         },
       });
     } else {
       return sendErrorResponse(res, "Invalid token", 401, {
-        token: {
+        auth: {
           message: "Invalid token",
         },
       });

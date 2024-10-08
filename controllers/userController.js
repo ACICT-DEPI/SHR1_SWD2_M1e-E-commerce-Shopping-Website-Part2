@@ -131,7 +131,7 @@ const sendForgetPasswordLink = asyncWrapper(async (req, res, next) => {
 
   const secret = process.env.JWT_SECRET_KEY + user.password;
   const resetToken = jwt.sign({ id: user._id, email: user.email }, secret, {
-    expiresIn: "20m",
+    expiresIn: "10m",
   });
 
   const resetLink = `http://localhost:3000/password/reset-password/${user._id}/${resetToken}`;
