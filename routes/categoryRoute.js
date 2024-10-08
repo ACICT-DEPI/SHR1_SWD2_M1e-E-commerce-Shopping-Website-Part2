@@ -8,6 +8,7 @@ const {
   updateCategory,
   categoryPhotoUpload,
   getNumberOfCategories,
+  categoryBannerUpload,
 } = require("../controllers/categoryController");
 const validateCategory = require("../middlewares/validateCategory");
 const verifyToken = require("../middlewares/verifyToken");
@@ -57,6 +58,14 @@ router.patch(
   allowedTo(userRole.ADMIN),
   imageUpload.single("image"),
   categoryPhotoUpload
+);
+
+router.patch(
+  "/category-banner-upload/:id",
+  verifyToken,
+  allowedTo(userRole.ADMIN),
+  imageUpload.single("banner"),
+  categoryBannerUpload
 );
 
 router.delete("/:id", verifyToken, allowedTo(userRole.ADMIN), deleteCategory);

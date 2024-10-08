@@ -15,6 +15,11 @@ const validateCategorySchema = (data) => {
     description: Joi.string().allow(null, "").optional().messages({
       "string.base": "Description must be a string",
     }),
+
+    isBannerVisible: Joi.boolean().optional().messages({
+      "boolean.base": "isBannerVisible must be a boolean value.",
+      "any.optional": "isBannerVisible is optional.",
+    }),
   });
 
   return schema.validate(data, { abortEarly: false }); // Capture all errors

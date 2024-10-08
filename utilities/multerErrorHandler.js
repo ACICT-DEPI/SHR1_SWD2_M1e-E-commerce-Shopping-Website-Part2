@@ -24,10 +24,11 @@ const multerErrorHandler = (err, req, res, next) => {
     if (err.code === "LIMIT_UNEXPECTED_FILE") {
       return sendErrorResponse(
         res,
-        "You can only upload up to 5 images.",
+        "There is an error. Please check the name of the field and ensure that the maximum number of uploaded images is up to 5.",
         400,
         {
-          message: "You can only upload up to 5 images.",
+          message:
+            "There is an error. Please check the name of the field and ensure that the maximum number of uploaded images is up to 5.",
         }
       );
     }

@@ -15,6 +15,7 @@ const addCategory = asyncWrapper(async (req, res) => {
   const newCategory = new Category({
     title: req.body.title,
     description: req.body.description,
+    isBannerVisible: req.body.isBannerVisible,
   });
   await newCategory.save();
   sendSuccessResponse(res, "Category saved successfully", 201, newCategory);
@@ -22,17 +23,21 @@ const addCategory = asyncWrapper(async (req, res) => {
 
 const getCategories = asyncWrapper(async (req, res) => {
   const query = req.query;
-  const limit = query.limit || 30;
+  const limit = query.limit
+    ? parseInt(query.limit, 10)
+    : await Category.countDocuments(); // If limit is not provided, use total count
   const page = query.page || 1;
   const skip = (page - 1) * limit;
 
   const totalCategories = await Category.countDocuments();
 
+  // Fetch categories based on limit and skip
   const categories = await Category.find({}, { __v: false })
     .limit(limit)
     .skip(skip);
+
   sendSuccessResponse(res, "Categories fetched successfully", 200, {
-    count: totalCategories,
+    "Total Categories": totalCategories,
     categories,
   });
 });
@@ -128,22 +133,69 @@ const categoryPhotoUpload = async (req, res, next) => {
       await removeFromCloudinary(category.image.public_id);
     }
 
-    const updatedCategory = await Category.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: {
-          image: {
-            url: result.secure_url,
-            public_id: result.public_id,
-          },
-        },
-      },
-      { new: true }
-    );
-
-    sendSuccessResponse(res, "Category photo uploaded successfully", 200, {
+    category.image = {
       url: result.secure_url,
       public_id: result.public_id,
+    };
+
+    await category.save();
+
+    sendSuccessResponse(res, "Category photo uploaded successfully", 200, {
+      image: {
+        url: result.secure_url,
+        public_id: result.public_id,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const categoryBannerUpload = async (req, res, next) => {
+  if (!checkIfIdIsValid(req.params.id)) {
+    return sendErrorResponse(res, "Invalid category ID", 404, {
+      category: {
+        message: "Invalid category ID",
+      },
+    });
+  }
+
+  const category = await Category.findById(req.params.id);
+  if (!category) {
+    return sendErrorResponse(res, "Category not found", 404, {
+      category: {
+        message: "Category not found",
+      },
+    });
+  }
+
+  try {
+    if (!req.file) {
+      return sendErrorResponse(res, "No file uploaded", 400, {
+        file: {
+          message: "No file uploaded",
+        },
+      });
+    }
+
+    const result = await uploadToCloudinary(req.file.buffer);
+
+    if (category.banner.public_id !== null) {
+      await removeFromCloudinary(category.banner.public_id);
+    }
+
+    category.banner = {
+      url: result.secure_url,
+      public_id: result.public_id,
+    };
+
+    await category.save();
+
+    sendSuccessResponse(res, "Category banner uploaded successfully", 200, {
+      banner: {
+        url: result.secure_url,
+        public_id: result.public_id,
+      },
     });
   } catch (error) {
     next(error);
@@ -193,5 +245,6 @@ module.exports = {
   getCategory,
   updateCategory,
   categoryPhotoUpload,
+  categoryBannerUpload,
   deleteCategory,
 };

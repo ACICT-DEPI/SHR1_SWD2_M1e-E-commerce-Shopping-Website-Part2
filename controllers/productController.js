@@ -47,7 +47,9 @@ const addProduct = asyncWrapper(async (req, res) => {
 
 const getProducts = asyncWrapper(async (req, res) => {
   const query = req.query;
-  const limit = query.limit || 30;
+  const limit = query.limit
+    ? parseInt(query.limit, 10)
+    : await Product.countDocuments(); // If limit is not provided, use total count
   const page = query.page || 1;
   const skip = (page - 1) * limit;
   let filter = {};

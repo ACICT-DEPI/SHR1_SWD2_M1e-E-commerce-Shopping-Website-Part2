@@ -39,7 +39,9 @@ const addCarousel = asyncWrapper(async (req, res) => {
 
 const getCarousels = asyncWrapper(async (req, res) => {
   const query = req.query;
-  const limit = query.limit || 30;
+  const limit = query.limit
+    ? parseInt(query.limit, 10)
+    : await Carousel.countDocuments(); // If limit is not provided, use total count
   const page = query.page || 1;
   const skip = (page - 1) * limit;
 
@@ -50,7 +52,7 @@ const getCarousels = asyncWrapper(async (req, res) => {
     .limit(limit)
     .skip(skip);
   sendSuccessResponse(res, "Carousels fetched successfully", 200, {
-    count: totalCarousels,
+    "Total Carousels": totalCarousels,
     carousels,
   });
 });
