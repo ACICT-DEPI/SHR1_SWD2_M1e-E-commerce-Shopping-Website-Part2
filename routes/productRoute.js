@@ -38,12 +38,7 @@ router.get(
   getNumberOfProducts
 );
 
-router.get(
-  "/featured-products",
-  verifyToken,
-  allowedTo(userRole.ADMIN),
-  getFeaturedProducts
-);
+router.get("/featured-products", getFeaturedProducts);
 
 router.get("/:id", getProduct);
 
