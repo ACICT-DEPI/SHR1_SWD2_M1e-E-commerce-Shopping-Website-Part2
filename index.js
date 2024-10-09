@@ -7,6 +7,7 @@ const productRoute = require("./routes/productRoute");
 const userRoute = require("./routes/userRoute");
 const adminRoute = require("./routes/adminRoute");
 const carouselRoute = require("./routes/carouselRoute");
+const orderRoute = require("./routes/orderRoute");
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -35,6 +36,7 @@ app.use(`${API_URL}/products`, productRoute);
 app.use(`${API_URL}/users`, userRoute);
 app.use(`${API_URL}/admins`, adminRoute);
 app.use(`${API_URL}/carousels`, carouselRoute);
+app.use(`${API_URL}/orders`, orderRoute);
 
 app.all("*", (req, res) => {
   return sendErrorResponse(res, "Resource Not Found", 404);
