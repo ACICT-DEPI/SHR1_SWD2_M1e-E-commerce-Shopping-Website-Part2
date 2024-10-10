@@ -10,6 +10,7 @@ const {
   sendForgetPasswordLink,
   getResetPassword,
   resetThePassword,
+  getProfileAdmin,
 } = require("../controllers/userController");
 const verifyToken = require("../middlewares/verifyToken");
 const {
@@ -30,6 +31,8 @@ const {
 } = require("../middlewares/checkUniquePhone");
 const multerErrorHandler = require("../utilities/multerErrorHandler");
 const { imageUpload } = require("../middlewares/imageUpload");
+const allowedTo = require("../middlewares/allowedTo");
+const userRole = require("../utilities/userRoles");
 
 const router = express.Router();
 
@@ -42,6 +45,13 @@ router.post(
 );
 
 router.get("/profile", verifyToken, getProfile);
+
+router.get(
+  "/profileAdmin",
+  verifyToken,
+  allowedTo(userRole.ADMIN),
+  getProfileAdmin
+);
 
 router.patch(
   "/update",

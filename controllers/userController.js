@@ -50,6 +50,28 @@ const getProfile = asyncWrapper(async (req, res) => {
   );
 });
 
+const getProfileAdmin = asyncWrapper(async (req, res) => {
+  const userProfileAdmin = await User.findById(req.currentUser.id, {
+    _id: false,
+    firstName: true,
+    lastName: true,
+    email: true,
+    phone: true,
+    avatar: true,
+  });
+  if (!userProfileAdmin) {
+    sendErrorResponse(res, "Admin not found", 404, {
+      admin: { message: "Admin not found" },
+    });
+  }
+  sendSuccessResponse(
+    res,
+    "Admin profile retrieved successfully",
+    200,
+    userProfileAdmin
+  );
+});
+
 const update = asyncWrapper(async (req, res) => {
   const user = await User.findById(req.currentUser.id);
   if (!user) {
@@ -319,6 +341,7 @@ const logout = asyncWrapper(async (req, res) => {
 module.exports = {
   register,
   getProfile,
+  getProfileAdmin,
   update,
   userPhotoUpload,
   changePassword,
