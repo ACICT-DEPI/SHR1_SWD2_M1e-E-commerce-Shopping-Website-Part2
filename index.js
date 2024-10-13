@@ -12,6 +12,16 @@ const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
+// const { createProxyMiddleware } = require("http-proxy-middleware");
+
+// app.use(
+//   "/server",
+//   createProxyMiddleware({ target: "http://localhost:5000", changeOrigin: true })
+// );
+// app.use(
+//   "/",
+//   createProxyMiddleware({ target: "http://localhost:3000", changeOrigin: true })
+// );
 
 app.use(express.json());
 const API_URL = process.env.API_URL;
@@ -21,7 +31,7 @@ const URL = process.env.MONGO_URL;
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:3000", // Frontend URL
+    origin: ["http://localhost:3000", "https://thirty-ends-read.loca.lt"], // Frontend URL
     credentials: true, // Allow credentials (cookies)
   })
 );
@@ -48,7 +58,7 @@ mongoose
   })
   .then(() => {
     console.log("App connected to database");
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       console.log(`App is listening to port: ${PORT}`);
     });
   })

@@ -312,12 +312,11 @@ const login = asyncWrapper(async (req, res, next) => {
     role: user.role,
   });
 
-  // Set token as an HTTP-only cookie with expiration (e.g., 1 hour)
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false,
-    maxAge: 60 * 60 * 1000, // 1 hour
-    path: "/",
+    secure: true, // Only use secure cookies in production
+    sameSite: "None",
+    maxAge: 24 * 60 * 60 * 1000, // 1 hour
   });
 
   // Send success response
