@@ -220,6 +220,20 @@ const getOrders = asyncWrapper(async (req, res) => {
   });
 });
 
+const getMyOrders = asyncWrapper(async (req, res) => {
+  const userId = req.currentUser.id;
+
+  // Find all orders where the userId matches the provided userId
+  const orders = await Order.find({ user: userId });
+
+  if (!orders || orders.length === 0) {
+    return sendErrorResponse(res, "No orders found for this user", 404, {
+      orders: { message: "No orders found for this user." },
+    });
+  }
+  sendSuccessResponse(res, "Orders fetched successfully", 200, orders);
+});
+
 const getOrder = asyncWrapper(async (req, res) => {
   if (!checkIfIdIsValid(req.params.id)) {
     return sendErrorResponse(res, "Invalid order ID", 404, {
@@ -300,6 +314,7 @@ module.exports = {
   handleProcessedCallback,
   handleResponseCallback,
   getOrders,
+  getMyOrders,
   getOrder,
   updateOrder,
   deleteOrder,

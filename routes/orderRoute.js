@@ -7,6 +7,7 @@ const {
   deleteOrder,
   handleProcessedCallback,
   handleResponseCallback,
+  getMyOrders,
 } = require("../controllers/orderController");
 const verifyToken = require("../middlewares/verifyToken");
 const allowedTo = require("../middlewares/allowedTo");
@@ -26,6 +27,8 @@ router.post("/processed-callback", handleProcessedCallback);
 router.get("/response-callback", handleResponseCallback);
 
 router.get("/", verifyToken, allowedTo(userRoles.ADMIN), getOrders);
+
+router.get("/my-orders", verifyToken, getMyOrders);
 
 router.get("/:id", verifyToken, allowedTo(userRoles.ADMIN), getOrder);
 
