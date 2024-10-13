@@ -129,7 +129,7 @@ const makeOrder = asyncWrapper(async (req, res) => {
     address: shippingAddress1,
     building: "NA",
     city,
-    zip: "NA",
+    zip: zip || "NA",
     country,
     apartment: "NA",
     floor: "NA",

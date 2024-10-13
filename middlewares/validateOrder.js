@@ -7,6 +7,7 @@ const validateOrderSchema = (data) => {
     orderItems: Joi.any(),
     shippingAddress1: Joi.string().required().messages({
       "string.base": "Shipping address 1 must be a string.",
+      "string.empty": "Shipping address 1 cannot be empty",
       "any.required": "Shipping address 1 is required.",
     }),
 
@@ -16,6 +17,7 @@ const validateOrderSchema = (data) => {
 
     city: Joi.string().required().messages({
       "string.base": "City must be a string.",
+      "string.empty": "City cannot be empty",
       "any.required": "City is required.",
     }),
 
@@ -25,6 +27,7 @@ const validateOrderSchema = (data) => {
 
     country: Joi.string().required().messages({
       "string.base": "Country must be a string.",
+      "string.empty": "Country cannot be empty",
       "any.required": "Country is required.",
     }),
 
@@ -35,19 +38,11 @@ const validateOrderSchema = (data) => {
       .required()
       .messages({
         "string.base": "Phone number must be a string.",
+        "string.empty": "Phone number cannot be empty",
         "string.min": "Phone number must be at least 10 digits.",
         "string.max": "Phone number must be no more than 15 digits.",
         "string.pattern.base": "Phone number must contain only digits.",
         "any.required": "Phone number is required.",
-      }),
-
-    status: Joi.string()
-      .valid("Pending", "Shipped", "Completed", "Cancelled")
-      .default("Pending")
-      .messages({
-        "any.only":
-          "Status must be one of ['Pending', 'Shipped', 'Completed', 'Cancelled'].",
-        "any.required": "Status is required.",
       }),
   });
   return schema.validate(data, { abortEarly: false }); // Capture all errors

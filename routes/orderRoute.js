@@ -18,7 +18,7 @@ const {
 
 const router = express.Router();
 
-router.post("/make-order", verifyToken, makeOrder);
+router.post("/make-order", verifyToken, validateOrder, makeOrder);
 
 // Route for Transaction Processed Callback (POST)
 router.post("/processed-callback", handleProcessedCallback);
