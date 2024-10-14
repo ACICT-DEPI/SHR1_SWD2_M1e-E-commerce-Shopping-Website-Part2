@@ -2,7 +2,10 @@ const asyncWrapper = require("../middlewares/asyncWrapper");
 const User = require("../models/userModel");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const sendPasswordResetEmail = require("../utilities/nodemailer");
+const {
+  sendPasswordResetEmail,
+  sendMessageEmail,
+} = require("../utilities/nodemailer");
 const generateJWT = require("../utilities/generateJWT");
 const {
   sendErrorResponse,
@@ -240,6 +243,27 @@ const resetThePassword = asyncWrapper(async (req, res, next) => {
   }
 });
 
+const sendMessage = asyncWrapper(async (req, res) => {
+  const { email, name, phone, message } = req.body;
+  const newMessage = {
+    email,
+    name,
+    phone,
+    message,
+  };
+
+  try {
+    // Send the email
+    let info = await sendMessageEmail(newMessage);
+
+    return sendSuccessResponse(res, "Message sent successfully!", 201, {
+      message: info,
+    });
+  } catch (error) {
+    return sendErrorResponse(res, "Failed to send message.", 400, error);
+  }
+});
+
 const userPhotoUpload = async (req, res, next) => {
   const user = await User.findById(req.currentUser.id);
   if (!user) {
@@ -328,7 +352,7 @@ const login = asyncWrapper(async (req, res, next) => {
 const logout = asyncWrapper(async (req, res) => {
   res.clearCookie("token", {
     httpOnly: true,
-    secure: false,
+    secure: true,
     path: "/",
   });
 
@@ -347,6 +371,7 @@ module.exports = {
   sendForgetPasswordLink,
   getResetPassword,
   resetThePassword,
+  sendMessage,
   login,
   logout,
 };

@@ -224,7 +224,12 @@ const getMyOrders = asyncWrapper(async (req, res) => {
   const userId = req.currentUser.id;
 
   // Find all orders where the userId matches the provided userId
-  const orders = await Order.find({ user: userId });
+  const orders = await Order.find({ user: userId })
+    .populate({
+      path: "orderItems",
+      populate: { path: "product", populate: "category" },
+    })
+    .populate("user", "firstName lastName");
 
   if (!orders || orders.length === 0) {
     return sendErrorResponse(res, "No orders found for this user", 404, {
@@ -232,6 +237,29 @@ const getMyOrders = asyncWrapper(async (req, res) => {
     });
   }
   sendSuccessResponse(res, "Orders fetched successfully", 200, orders);
+});
+
+const getMyOrderById = asyncWrapper(async (req, res) => {
+  const userId = req.currentUser.id; // Get the current user ID
+  const { orderId } = req.params; // Get the order ID from the request parameters
+
+  // Find the specific order where both the order ID and user ID match
+  const order = await Order.findOne({ _id: orderId, user: userId })
+    .populate({
+      path: "orderItems",
+      populate: { path: "product", populate: "category" },
+    })
+    .populate("user", "firstName lastName");
+
+  // If no order is found or it does not belong to the user
+  if (!order) {
+    return sendErrorResponse(res, "Order not found for this user", 404, {
+      order: { message: "No order found for this user." },
+    });
+  }
+
+  // Send the order if found
+  sendSuccessResponse(res, "Order fetched successfully", 200, order);
 });
 
 const getOrder = asyncWrapper(async (req, res) => {
@@ -315,6 +343,7 @@ module.exports = {
   handleResponseCallback,
   getOrders,
   getMyOrders,
+  getMyOrderById,
   getOrder,
   updateOrder,
   deleteOrder,

@@ -8,6 +8,7 @@ const {
   handleProcessedCallback,
   handleResponseCallback,
   getMyOrders,
+  getMyOrderById,
 } = require("../controllers/orderController");
 const verifyToken = require("../middlewares/verifyToken");
 const allowedTo = require("../middlewares/allowedTo");
@@ -29,6 +30,8 @@ router.get("/response-callback", handleResponseCallback);
 router.get("/", verifyToken, allowedTo(userRoles.ADMIN), getOrders);
 
 router.get("/my-orders", verifyToken, getMyOrders);
+
+router.get("/my-orders/:orderId", verifyToken, getMyOrderById);
 
 router.get("/:id", verifyToken, allowedTo(userRoles.ADMIN), getOrder);
 

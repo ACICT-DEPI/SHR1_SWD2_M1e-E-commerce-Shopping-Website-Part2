@@ -11,6 +11,7 @@ const {
   getResetPassword,
   resetThePassword,
   getProfileAdmin,
+  sendMessage,
 } = require("../controllers/userController");
 const verifyToken = require("../middlewares/verifyToken");
 const {
@@ -33,6 +34,7 @@ const multerErrorHandler = require("../utilities/multerErrorHandler");
 const { imageUpload } = require("../middlewares/imageUpload");
 const allowedTo = require("../middlewares/allowedTo");
 const userRole = require("../utilities/userRoles");
+const { validateMessage } = require("../middlewares/validateMessageEmail");
 
 const router = express.Router();
 
@@ -80,6 +82,8 @@ router.post(
   validateNewPassword,
   resetThePassword
 );
+
+router.post("/send-message", validateMessage, sendMessage);
 
 router.post("/login", login);
 
