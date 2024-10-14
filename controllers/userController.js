@@ -244,12 +244,11 @@ const resetThePassword = asyncWrapper(async (req, res, next) => {
 });
 
 const sendMessage = asyncWrapper(async (req, res) => {
-  const { email, name, phone, message } = req.body;
+  const { email, name, messageBody } = req.body;
   const newMessage = {
     email,
     name,
-    phone,
-    message,
+    messageBody,
   };
 
   try {

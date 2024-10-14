@@ -26,21 +26,10 @@ const validateMessageSchema = (data) => {
           "Email must be a valid email address and match the format: example@domain.com",
         "any.required": "Email is required",
       }),
-    phone: Joi.string()
-      .trim()
-      .pattern(/^[0-9]{10,15}$/)
-      .required()
-      .messages({
-        "string.base": "Phone number must be a string",
-        "string.empty": "Phone number is required",
-        "string.pattern.base":
-          "Phone number must be valid, It must be contains only numbers between 10 and 15",
-        "any.required": "Phone number is required",
-      }),
-    message: Joi.string().min(3).required().messages({
-      "string.empty": "Name cannot be empty", // Added this for empty string validation
-      "string.min": "Name should be at least 3 characters long",
-      "any.required": "Name is required",
+    messageBody: Joi.string().min(3).required().messages({
+      "string.empty": "Message cannot be empty", // Added this for empty string validation
+      "string.min": "Message should be at least 3 characters long",
+      "any.required": "Message is required",
     }),
   });
   return schema.validate(data, { abortEarly: false }); // Capture all errors

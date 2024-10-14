@@ -27,13 +27,12 @@ const sendPasswordResetEmail = async (email, resetLink) => {
   }
 };
 
-const sendMessageEmail = async ({ email, name, phone, message }) => {
+const sendMessageEmail = async ({ email, name, messageBody }) => {
   return await transporter.sendMail({
     from: `${email}`, // Sender's name and email
     to: process.env.EMAIL_ADDRESS, // Email address to send the contact form (e.g., your email)
     subject: `Message from ${name}`, // Subject line of the email
-    html: `<div><b>Phone:</b> ${phone}</div>
-          <div><b> Message:</b> ${message}</div>`, // Plain text body of the email
+    html: `${messageBody}`, // Plain text body of the email
   });
 };
 
