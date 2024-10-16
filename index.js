@@ -8,20 +8,11 @@ const userRoute = require("./routes/userRoute");
 const adminRoute = require("./routes/adminRoute");
 const carouselRoute = require("./routes/carouselRoute");
 const orderRoute = require("./routes/orderRoute");
+const reviewRoute = require("./routes/reviewRoute");
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
-// const { createProxyMiddleware } = require("http-proxy-middleware");
-
-// app.use(
-//   "/server",
-//   createProxyMiddleware({ target: "http://localhost:5000", changeOrigin: true })
-// );
-// app.use(
-//   "/",
-//   createProxyMiddleware({ target: "http://localhost:3000", changeOrigin: true })
-// );
 
 app.use(express.json());
 const API_URL = process.env.API_URL;
@@ -47,6 +38,7 @@ app.use(`${API_URL}/users`, userRoute);
 app.use(`${API_URL}/admins`, adminRoute);
 app.use(`${API_URL}/carousels`, carouselRoute);
 app.use(`${API_URL}/orders`, orderRoute);
+app.use(`${API_URL}/reviews`, reviewRoute);
 
 app.all("*", (req, res) => {
   return sendErrorResponse(res, "Resource Not Found", 404);
