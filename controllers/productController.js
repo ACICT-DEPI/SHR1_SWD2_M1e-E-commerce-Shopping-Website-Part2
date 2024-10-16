@@ -276,7 +276,7 @@ const deleteProduct = asyncWrapper(async (req, res) => {
   try {
     product.gallery.map(async (photo) => {
       if (photo.public_id !== null) {
-        await cloudinaryRemoveFile(photo.public_id);
+        await removeFromCloudinary(photo.public_id);
       }
     });
   } catch (error) {
