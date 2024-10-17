@@ -20,6 +20,7 @@ const {
 let orderDetails = {
   orderItems: [],
   order: {},
+  productId: null,
 };
 
 const makeOrder = asyncWrapper(async (req, res) => {
@@ -167,7 +168,7 @@ const handleProcessedCallback = async (req, res) => {
       });
     }
 
-    req.query.productId = newOrder._id;
+    orderDetails.productId = newOrder._id;
 
     sendSuccessResponse(res, "Order created successfully", 201, newOrder);
   } catch (error) {
@@ -177,14 +178,13 @@ const handleProcessedCallback = async (req, res) => {
 
 const handleResponseCallback = async (req, res) => {
   try {
-    const { productId, success, message } = req.query; // Adjust this based on your actual request structure
+    const { success, message } = req.query; // Adjust this based on your actual request structure
+    const productId = orderDetails.productId;
 
     if (success === "true") {
       // If payment was successful
       // Redirect to the orders route with the productId
-      res.redirect(
-        `https://server-esw.up.railway.app/api/v1/orders/my-orders/${productId}`
-      );
+      res.redirect(`https://client-esw.vercel.app/my-orders/${productId}`);
     } else {
       // If payment failed
       // Redirect to an error page or the same route with an error message
