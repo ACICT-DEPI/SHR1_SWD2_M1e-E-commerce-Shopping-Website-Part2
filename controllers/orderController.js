@@ -167,7 +167,7 @@ const handleProcessedCallback = async (req, res) => {
       });
     }
 
-    req.productId = newOrder._id;
+    req.query.productId = newOrder._id;
 
     sendSuccessResponse(res, "Order created successfully", 201, newOrder);
   } catch (error) {
@@ -177,8 +177,7 @@ const handleProcessedCallback = async (req, res) => {
 
 const handleResponseCallback = async (req, res) => {
   try {
-    const { success, message } = req.query; // Adjust this based on your actual request structure
-    const productId = req.productId;
+    const { productId, success, message } = req.query; // Adjust this based on your actual request structure
 
     if (success === "true") {
       // If payment was successful
