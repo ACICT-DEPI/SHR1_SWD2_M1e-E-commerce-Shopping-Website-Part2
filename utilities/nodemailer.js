@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const emailTemplate = require("../templates/emailTemplate");
+const { sendSuccessResponse, sendErrorResponse } = require("./sendResponse");
 
 // Configure your SMTP transport
 const transporter = nodemailer.createTransport({
@@ -26,4 +27,13 @@ const sendPasswordResetEmail = async (email, resetLink) => {
   }
 };
 
-module.exports = sendPasswordResetEmail;
+const sendMessageEmail = async ({ email, name, messageBody }) => {
+  return await transporter.sendMail({
+    from: `${email}`, // Sender's name and email
+    to: process.env.EMAIL_ADDRESS, // Email address to send the contact form (e.g., your email)
+    subject: `Message from ${name}`, // Subject line of the email
+    html: `${messageBody}`, // Plain text body of the email
+  });
+};
+
+module.exports = { sendPasswordResetEmail, sendMessageEmail };

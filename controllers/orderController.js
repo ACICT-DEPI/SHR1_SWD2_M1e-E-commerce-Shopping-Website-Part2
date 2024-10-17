@@ -129,7 +129,7 @@ const makeOrder = asyncWrapper(async (req, res) => {
     address: shippingAddress1,
     building: "NA",
     city,
-    zip: "NA",
+    zip: zip || "NA",
     country,
     apartment: "NA",
     floor: "NA",
@@ -167,6 +167,8 @@ const handleProcessedCallback = async (req, res) => {
       });
     }
 
+    req.query.productId = newOrder._id;
+
     sendSuccessResponse(res, "Order created successfully", 201, newOrder);
   } catch (error) {
     return sendErrorResponse(res, "Error during payment process", 500, error);
@@ -175,22 +177,22 @@ const handleProcessedCallback = async (req, res) => {
 
 const handleResponseCallback = async (req, res) => {
   try {
-    const { success, message } = req.query; // Adjust this based on your actual request structure
+    const { productId, success, message } = req.query; // Adjust this based on your actual request structure
 
     if (success === "true") {
       // If payment was successful
-      // You can render a success page or redirect
-      res.status(200).send(`
-        <h1>Payment Successful</h1>
-        <p>${message || "Thank you for your payment!"}</p>
-      `);
+      // Redirect to the orders route with the productId
+      res.redirect(
+        `https://server-esw.up.railway.app/api/v1/orders/my-orders/${productId}`
+      );
     } else {
       // If payment failed
-      // You can render a failure page or redirect
-      res.status(400).send(`
-        <h1>Payment Failed</h1>
-        <p>${message || "There was an issue with your payment."}</p>
-      `);
+      // Redirect to an error page or the same route with an error message
+      res.redirect(
+        `https://client-esw.vercel.app/checkOut?error=${encodeURIComponent(
+          message || "There was an issue with your payment."
+        )}`
+      );
     }
   } catch (error) {
     return sendErrorResponse(
@@ -218,6 +220,48 @@ const getOrders = asyncWrapper(async (req, res) => {
     "Total Orders": totalOrders,
     orders,
   });
+});
+
+const getMyOrders = asyncWrapper(async (req, res) => {
+  const userId = req.currentUser.id;
+
+  // Find all orders where the userId matches the provided userId
+  const orders = await Order.find({ user: userId })
+    .populate({
+      path: "orderItems",
+      populate: { path: "product", populate: "category" },
+    })
+    .populate("user", "firstName lastName");
+
+  if (!orders || orders.length === 0) {
+    return sendErrorResponse(res, "No orders found for this user", 404, {
+      orders: { message: "No orders found for this user." },
+    });
+  }
+  sendSuccessResponse(res, "Orders fetched successfully", 200, orders);
+});
+
+const getMyOrderById = asyncWrapper(async (req, res) => {
+  const userId = req.currentUser.id; // Get the current user ID
+  const { orderId } = req.params; // Get the order ID from the request parameters
+
+  // Find the specific order where both the order ID and user ID match
+  const order = await Order.findOne({ _id: orderId, user: userId })
+    .populate({
+      path: "orderItems",
+      populate: { path: "product", populate: "category" },
+    })
+    .populate("user", "firstName lastName");
+
+  // If no order is found or it does not belong to the user
+  if (!order) {
+    return sendErrorResponse(res, "Order not found for this user", 404, {
+      order: { message: "No order found for this user." },
+    });
+  }
+
+  // Send the order if found
+  sendSuccessResponse(res, "Order fetched successfully", 200, order);
 });
 
 const getOrder = asyncWrapper(async (req, res) => {
@@ -300,6 +344,8 @@ module.exports = {
   handleProcessedCallback,
   handleResponseCallback,
   getOrders,
+  getMyOrders,
+  getMyOrderById,
   getOrder,
   updateOrder,
   deleteOrder,

@@ -6,7 +6,7 @@ const verifyToken = (req, res, next) => {
 
   // Check if the token exists in the cookies
   if (!token) {
-    return sendErrorResponse(res, "Token is required", 401, {
+    return sendErrorResponse(res, "Please sign in to continue", 401, {
       auth: {
         message: "Token is required",
       },
@@ -14,23 +14,33 @@ const verifyToken = (req, res, next) => {
   }
 
   try {
-    // Verify the token using your secret key
+    // Verify the token using the secret key
     const currentUser = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    req.currentUser = currentUser; // Add user data to the request object
-    next(); // Proceed to the next middleware
+    req.currentUser = currentUser; // Attach user info to the request object
+    next(); // Move to the next middleware or route handler
   } catch (err) {
     if (err.name === "TokenExpiredError") {
-      return sendErrorResponse(res, "Invalid is expired", 401, {
-        auth: {
-          message: "Invalid is expired",
-        },
-      });
+      return sendErrorResponse(
+        res,
+        "Your session has expired, please sign in again",
+        401,
+        {
+          auth: {
+            message: "Token expired",
+          },
+        }
+      );
     } else {
-      return sendErrorResponse(res, "Invalid token", 401, {
-        auth: {
-          message: "Invalid token",
-        },
-      });
+      return sendErrorResponse(
+        res,
+        "Invalid token, please sign in again",
+        401,
+        {
+          auth: {
+            message: "Invalid token",
+          },
+        }
+      );
     }
   }
 };

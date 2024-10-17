@@ -7,6 +7,8 @@ const {
   deleteOrder,
   handleProcessedCallback,
   handleResponseCallback,
+  getMyOrders,
+  getMyOrderById,
 } = require("../controllers/orderController");
 const verifyToken = require("../middlewares/verifyToken");
 const allowedTo = require("../middlewares/allowedTo");
@@ -18,7 +20,7 @@ const {
 
 const router = express.Router();
 
-router.post("/make-order", verifyToken, makeOrder);
+router.post("/make-order", verifyToken, validateOrder, makeOrder);
 
 // Route for Transaction Processed Callback (POST)
 router.post("/processed-callback", handleProcessedCallback);
@@ -26,6 +28,10 @@ router.post("/processed-callback", handleProcessedCallback);
 router.get("/response-callback", handleResponseCallback);
 
 router.get("/", verifyToken, allowedTo(userRoles.ADMIN), getOrders);
+
+router.get("/my-orders", verifyToken, getMyOrders);
+
+router.get("/my-orders/:orderId", verifyToken, getMyOrderById);
 
 router.get("/:id", verifyToken, allowedTo(userRoles.ADMIN), getOrder);
 
