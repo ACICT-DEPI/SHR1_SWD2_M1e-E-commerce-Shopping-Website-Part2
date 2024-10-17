@@ -71,6 +71,26 @@ const createReview = asyncWrapper(async (req, res) => {
   sendSuccessResponse(res, "Review created successfully", 201, review);
 });
 
+// Get my review
+const getMyReview = asyncWrapper(async (req, res) => {
+  const { productId } = req.params;
+  const userId = req.currentUser.id;
+
+  const review = await Review.find({
+    user: userId,
+    product: productId,
+  }).populate("user", "firstName lastName"); // Populating user info if necessary
+
+  if (!review) {
+    return sendErrorResponse(res, "Review not found", 404, {
+      reviews: {
+        message: "Review not found",
+      },
+    });
+  }
+  sendSuccessResponse(res, "Review fetched successfully", 200, review);
+});
+
 // Get all reviews
 const getAllReviews = asyncWrapper(async (req, res) => {
   const reviews = await Review.find().populate("user", "firstName lastName"); // Populating user info if necessary
@@ -240,6 +260,7 @@ const deleteReview = asyncWrapper(async (req, res) => {
 
 module.exports = {
   createReview,
+  getMyReview,
   getAllReviews,
   getProductReviews,
   getReview,
