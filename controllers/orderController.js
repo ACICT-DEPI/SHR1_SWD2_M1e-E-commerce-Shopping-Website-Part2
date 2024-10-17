@@ -167,6 +167,8 @@ const handleProcessedCallback = async (req, res) => {
       });
     }
 
+    req.productId = newOrder._id;
+
     sendSuccessResponse(res, "Order created successfully", 201, newOrder);
   } catch (error) {
     return sendErrorResponse(res, "Error during payment process", 500, error);
@@ -176,21 +178,22 @@ const handleProcessedCallback = async (req, res) => {
 const handleResponseCallback = async (req, res) => {
   try {
     const { success, message } = req.query; // Adjust this based on your actual request structure
+    const productId = req.productId;
 
     if (success === "true") {
       // If payment was successful
-      // You can render a success page or redirect
-      res.status(200).send(`
-        <h1>Payment Successful</h1>
-        <p>${message || "Thank you for your payment!"}</p>
-      `);
+      // Redirect to the orders route with the productId
+      res.redirect(
+        `https://server-esw.up.railway.app/api/v1/orders/my-orders/${productId}`
+      );
     } else {
       // If payment failed
-      // You can render a failure page or redirect
-      res.status(400).send(`
-        <h1>Payment Failed</h1>
-        <p>${message || "There was an issue with your payment."}</p>
-      `);
+      // Redirect to an error page or the same route with an error message
+      res.redirect(
+        `https://client-esw.vercel.app/checkOut?error=${encodeURIComponent(
+          message || "There was an issue with your payment."
+        )}`
+      );
     }
   } catch (error) {
     return sendErrorResponse(

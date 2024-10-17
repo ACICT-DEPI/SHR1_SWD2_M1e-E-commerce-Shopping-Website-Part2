@@ -6,6 +6,7 @@ const {
   getReview,
   getAllReviews,
   updateReview,
+  getMyReview,
 } = require("../controllers/reviewController");
 const verifyToken = require("../middlewares/verifyToken");
 const allowedTo = require("../middlewares/allowedTo");
@@ -19,6 +20,9 @@ const router = express.Router();
 
 // Route to create a review (protected route)
 router.post("/product/:productId", verifyToken, validateReview, createReview);
+
+// Route to get my review
+router.get("/product/:productId/my-review", verifyToken, getMyReview);
 
 // Route to get a review
 router.get("/:reviewId", verifyToken, allowedTo(userRole.ADMIN), getReview);
