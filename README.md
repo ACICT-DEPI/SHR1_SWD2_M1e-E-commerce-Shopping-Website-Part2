@@ -2,6 +2,10 @@
 
 **E-commerce Shopping Website - Server** is the backend part of a modern, responsive, and feature-rich e-commerce platform built with Node.js and Express. This application provides APIs to manage the e-commerce functionalities.
 
+# Video for Website on YouTube
+
+- [Watch the video](https://youtu.be/BOG4rE4gvJY)
+
 ## Table of Contents
 
 - [Features](#features)
